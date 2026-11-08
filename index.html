@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Colorblind Visualizer</title>
+  <meta name="description" content="Upload an image and compare it side by side under eight simulated types of color blindness, across one or more screens.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.7"/><path d="M21 16l-5-5-9 9"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h3M13 17h7"/><circle cx="16" cy="7" r="2.5"/><circle cx="10" cy="17" r="2.5"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+    <symbol id="i-shrink" viewBox="0 0 24 24"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></symbol>
+    <symbol id="i-window" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8 8"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24"><path d="M15 4h5v5M9 20H4v-5M20 4l-6 6M4 20l6-6"/></symbol>
+    <symbol id="i-unfocus" viewBox="0 0 24 24"><path d="M20 4l-6 6M14 5v5h5M4 20l6-6M10 19v-5H5"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.6 9.6 0 0 1 12 6c5 0 8.5 4 9.5 6-.5 1-1.6 2.6-3.2 3.9M6.6 7.6C4.6 8.9 3.1 10.8 2.5 12c1 2 4.5 6 9.5 6 1.6 0 3-.4 4.3-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><rect x="13" y="13" width="7" height="7" rx="1"/></symbol>
+    <symbol id="i-compare" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></symbol>
+  </svg>
+
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="9.3" r="5.6"/><circle cx="15" cy="9.3" r="5.6"/><circle cx="12" cy="14.5" r="5.6"/></svg>
+        <span class="brand-name">Colorblind Visualizer</span>
+      </div>
+      <span class="brand-sep" aria-hidden="true"></span>
+      <nav class="tabs" id="tabs" role="tablist" aria-label="Screens"></nav>
+      <div class="bar-actions">
+        <button class="btn btn-primary" id="btnOpen" type="button" title="Open an image (O). You can also drop or paste one.">
+          <svg class="icon"><use href="#i-image"/></svg><span class="btn-label">Open image</span>
+        </button>
+        <button class="icon-btn" id="btnPopout" type="button" data-wide title="Open this screen in a new window" aria-label="Open this screen in a new window">
+          <svg class="icon"><use href="#i-window"/></svg>
+        </button>
+        <button class="icon-btn" id="btnFullscreen" type="button" data-wide title="Fullscreen (F)" aria-label="Fullscreen">
+          <svg class="icon"><use href="#i-expand"/></svg>
+        </button>
+        <button class="icon-btn" id="btnHideUi" type="button" data-wide title="Show previews only (H)" aria-label="Show previews only">
+          <svg class="icon"><use href="#i-eye-off"/></svg>
+        </button>
+        <button class="icon-btn" id="btnSettings" type="button" aria-controls="rail" aria-pressed="true" title="Settings (S)" aria-label="Settings">
+          <svg class="icon"><use href="#i-sliders"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="stage" id="stage" role="tabpanel" aria-label="Previews" data-backdrop="theme">
+      <div class="grid" id="grid"></div>
+      <div class="stage-empty" id="stageEmpty" hidden>
+        <strong>No views on this screen</strong>
+        <span>Pick the types of color blindness to show here.</span>
+        <button class="btn" id="btnChooseViews" type="button"><svg class="icon"><use href="#i-sliders"/></svg>Choose views</button>
+      </div>
+      <div class="drop-overlay" id="dropOverlay" hidden>Drop the image to load it</div>
+    </main>
+
+    <aside class="rail" id="rail" aria-label="Settings">
+      <div class="rail-head">
+        <h2>Settings</h2>
+        <button class="icon-btn" id="railClose" type="button" aria-label="Close settings" title="Close (S)">
+          <svg class="icon"><use href="#i-x"/></svg>
+        </button>
+      </div>
+
+      <section class="section" aria-labelledby="secScreen">
+        <div class="section-head">
+          <h3 class="section-title" id="secScreen">Screen</h3>
+          <span class="section-meta" id="screenMeta"></span>
+        </div>
+        <input class="text-input" id="screenName" type="text" maxlength="40" autocomplete="off" spellcheck="false" aria-label="Screen name">
+        <div class="btn-row">
+          <button class="btn" id="btnAddScreen" type="button"><svg class="icon"><use href="#i-plus"/></svg>New</button>
+          <button class="btn" id="btnDuplicate" type="button"><svg class="icon"><use href="#i-copy"/></svg>Duplicate</button>
+          <button class="btn btn-ghost" id="btnDelete" type="button"><svg class="icon"><use href="#i-trash"/></svg>Delete</button>
+        </div>
+        <button class="btn btn-block" id="btnPopout2" type="button"><svg class="icon"><use href="#i-window"/></svg>Open in a new window</button>
+        <p class="hint">Use one window per monitor. Every window stays in sync with the image, settings and zoom.</p>
+      </section>
+
+      <section class="section" aria-labelledby="secViews">
+        <div class="section-head">
+          <h3 class="section-title" id="secViews">Views on this screen</h3>
+          <span class="section-meta" id="viewsMeta"></span>
+        </div>
+        <div class="presets" role="group" aria-label="Quick selections">
+          <button class="chip" type="button" data-preset="all">All</button>
+          <button class="chip" type="button" data-preset="none">None</button>
+          <button class="chip" type="button" data-preset="redgreen">Red–green</button>
+          <button class="chip" type="button" data-preset="blueyellow">Blue–yellow</button>
+          <button class="chip" type="button" data-preset="mono">Monochrome</button>
+        </div>
+        <ul class="views" id="viewList"></ul>
+      </section>
+
+      <section class="section" aria-labelledby="secLayout">
+        <div class="section-head">
+          <h3 class="section-title" id="secLayout">Layout</h3>
+          <span class="section-meta" id="layoutMeta"></span>
+        </div>
+        <div class="row">
+          <span class="row-label" id="lblCols">Columns</span>
+          <div class="layout-controls" data-axis="cols" role="group" aria-labelledby="lblCols">
+            <button class="toggle-auto" type="button" data-auto aria-pressed="true">Auto</button>
+            <div class="stepper">
+              <button type="button" data-step="-1" aria-label="Fewer columns"><svg class="icon"><use href="#i-minus"/></svg></button>
+              <output aria-live="polite"></output>
+              <button type="button" data-step="1" aria-label="More columns"><svg class="icon"><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-label" id="lblRows">Rows</span>
+          <div class="layout-controls" data-axis="rows" role="group" aria-labelledby="lblRows">
+            <button class="toggle-auto" type="button" data-auto aria-pressed="true">Auto</button>
+            <div class="stepper">
+              <button type="button" data-step="-1" aria-label="Fewer rows"><svg class="icon"><use href="#i-minus"/></svg></button>
+              <output aria-live="polite"></output>
+              <button type="button" data-step="1" aria-label="More rows"><svg class="icon"><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <p class="layout-note" id="layoutNote" hidden></p>
+        <p class="hint">Auto picks the grid that shows the previews as large as possible.</p>
+      </section>
+
+      <section class="section" aria-labelledby="secSim">
+        <div class="section-head">
+          <h3 class="section-title" id="secSim">Simulation</h3>
+        </div>
+        <label for="severity">Severity of the partial types</label>
+        <div class="range-row">
+          <input type="range" id="severity" min="0" max="100" step="5" value="60">
+          <output id="severityOut" for="severity">60%</output>
+        </div>
+        <p class="hint">Applies to Protanomaly, Deuteranomaly, Tritanomaly and Achromatomaly. At 100% they match the complete forms.</p>
+      </section>
+
+      <section class="section" aria-labelledby="secDisplay">
+        <div class="section-head">
+          <h3 class="section-title" id="secDisplay">Display</h3>
+          <span class="section-meta">All screens</span>
+        </div>
+        <div class="row">
+          <label for="labels">Labels on previews</label>
+          <span class="switch"><input type="checkbox" id="labels" checked><span aria-hidden="true"></span></span>
+        </div>
+        <div class="row">
+          <span class="row-label" id="lblGap">Spacing</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lblGap" data-setting="gap">
+            <button type="button" role="radio" data-value="0">None</button>
+            <button type="button" role="radio" data-value="4">Small</button>
+            <button type="button" role="radio" data-value="12">Large</button>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-label" id="lblBackdrop">Backdrop</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lblBackdrop" data-setting="backdrop">
+            <button type="button" role="radio" data-value="theme" title="Follow the theme" aria-label="Follow the theme"><span class="swatch" data-b="theme"></span></button>
+            <button type="button" role="radio" data-value="black" title="Black" aria-label="Black"><span class="swatch" data-b="black"></span></button>
+            <button type="button" role="radio" data-value="grey" title="Mid grey" aria-label="Mid grey"><span class="swatch" data-b="grey"></span></button>
+            <button type="button" role="radio" data-value="white" title="White" aria-label="White"><span class="swatch" data-b="white"></span></button>
+            <button type="button" role="radio" data-value="checker" title="Checkerboard, for transparent images" aria-label="Checkerboard"><span class="swatch" data-b="checker"></span></button>
+          </div>
+        </div>
+        <div class="row">
+          <span class="row-label" id="lblTheme">Theme</span>
+          <div class="seg" role="radiogroup" aria-labelledby="lblTheme" data-setting="theme">
+            <button type="button" role="radio" data-value="system">System</button>
+            <button type="button" role="radio" data-value="light">Light</button>
+            <button type="button" role="radio" data-value="dark">Dark</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="secExport">
+        <div class="section-head">
+          <h3 class="section-title" id="secExport">Export</h3>
+        </div>
+        <button class="btn btn-block" id="btnExport" type="button"><svg class="icon"><use href="#i-grid"/></svg>Download this screen as PNG</button>
+        <p class="hint">Saves every view on this screen in its current grid, at full resolution. Single views download from the button on each preview.</p>
+      </section>
+
+      <section class="section" aria-labelledby="secKeys">
+        <div class="section-head">
+          <h3 class="section-title" id="secKeys">Shortcuts</h3>
+        </div>
+        <dl class="shortcuts">
+          <dt><kbd>1</kbd>–<kbd>9</kbd></dt><dd>Switch screen (<kbd>←</kbd> <kbd>→</kbd> to step)</dd>
+          <dt><kbd>Space</kbd></dt><dd>Hold to show the original everywhere</dd>
+          <dt><kbd>Scroll</kbd></dt><dd>Zoom all previews together</dd>
+          <dt><kbd>Drag</kbd></dt><dd>Pan; double-click to zoom or reset</dd>
+          <dt><kbd>0</kbd> <kbd>+</kbd> <kbd>−</kbd></dt><dd>Reset, zoom in, zoom out</dd>
+          <dt><kbd>F</kbd></dt><dd>Fullscreen</dd>
+          <dt><kbd>H</kbd></dt><dd>Previews only</dd>
+          <dt><kbd>S</kbd></dt><dd>Settings</dd>
+          <dt><kbd>O</kbd></dt><dd>Open image (or drop / paste)</dd>
+        </dl>
+      </section>
+
+      <section class="section" aria-labelledby="secAbout">
+        <div class="section-head">
+          <h3 class="section-title" id="secAbout">How it is simulated</h3>
+        </div>
+        <p class="hint">Everything runs in your browser; images are never uploaded. Colours are converted to linear RGB, transformed, then converted back to sRGB.</p>
+        <ul class="refs">
+          <li>Complete red, green and blue loss: Brettel, Viénot &amp; Mollon, 1997.</li>
+          <li>Partial red and green loss: Machado, Oliveira &amp; Fernandes, 2009.</li>
+          <li>Partial blue loss: Brettel 1997 blended with the original by severity.</li>
+          <li>Monochromacy: relative luminance (Rec. 709).</li>
+          <li>Constants follow the <a href="https://github.com/DaltonLens/DaltonLens-Python" target="_blank" rel="noopener">DaltonLens</a> reference.</li>
+        </ul>
+      </section>
+    </aside>
+
+    <footer class="statusbar" id="statusbar">
+      <span class="status-file" id="statusFile">Loading…</span>
+      <span class="status-sep" aria-hidden="true">·</span>
+      <span id="statusSize"></span>
+      <span class="status-sep status-zoom" aria-hidden="true">·</span>
+      <span class="status-zoom" id="statusZoom"></span>
+      <span class="status-busy" id="statusBusy" hidden></span>
+      <span class="status-spacer"></span>
+      <span class="status-hints">
+        <span><kbd>Scroll</kbd> zoom</span>
+        <span><kbd>Space</kbd> compare</span>
+        <span><kbd>H</kbd> previews only</span>
+      </span>
+    </footer>
+  </div>
+
+  <button class="ui-restore" id="uiRestore" type="button">Show interface <kbd>H</kbd></button>
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <input type="file" id="fileInput" accept="image/*" hidden>
+
+  <script src="js/cvd.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
